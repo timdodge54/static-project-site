@@ -5,71 +5,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Projects Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 
-<body>
-    <header>
-        <h1>My Projects Portfolio</h1>
+<body class="bg-light">
+    <header class="bg-dark text-white py-4 mb-5">
+        <div class="container">
+            <h1 class="display-4">My Projects Portfolio</h1>
+            <p class="lead">Showcasing my work in robotics, control systems, and data science.</p>
+        </div>
     </header>
 
-    <main>
-        <section class="project">
-            <h2>Mars Rover Senior Design Project</h2>
-            <p><strong>Technologies:</strong> C++, C#, SolidWorks, Microcontrollers</p>
-            <ul>
-                <li>Designed and implemented inverse kinematic controls for a robotic arm, allowing for efficient
-                    real-time operation.</li>
-                <li>Enhanced micro-controller software, reducing latency by 30% through integrating serial communication
-                    with ROS.</li>
-                <li>Worked with team to design a novel 6-axis robotic arm using worm-gears and linear rail actuation in
-                    SolidWorks.</li>
-            </ul>
+    <main class="container">
+        <section class="project mb-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title">Mars Rover Senior Design Project</h2>
+                    <p class="card-text"><strong>Technologies:</strong> C++, C#, SolidWorks, Microcontrollers</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Designed and implemented inverse kinematic controls for a robotic
+                            arm, allowing for efficient real-time operation.</li>
+                        <li class="list-group-item">Enhanced micro-controller software, reducing latency by 30% through
+                            integrating serial communication with ROS.</li>
+                        <li class="list-group-item">Worked with team to design a novel 6-axis robotic arm using
+                            worm-gears and linear rail actuation in SolidWorks.</li>
+                    </ul>
+                </div>
+            </div>
         </section>
 
-        <section class="project">
-            <h2>Epsilon Point Controller</h2>
-            <p><strong>Technologies:</strong> Nonlinear Controls, Python, Numpy, ROS2, Gazebo</p>
-            <ul>
-                <li>Engineered a controller for a smooth differential drive robot to track nonlinear and time-varying
-                    trajectories.</li>
-                <li>Optimized controller for Turtlebot3 platform, respecting velocity constraints by applying LQR
-                    techniques.</li>
-                <li>Streamlined control system, achieving convergence to the true trajectory within 2 seconds of
-                    receiving a new signal.</li>
-            </ul>
+        <section class="project mb-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title">Epsilon Point Controller</h2>
+                    <p class="card-text"><strong>Technologies:</strong> Nonlinear Controls, Python, Numpy, ROS2, Gazebo
+                    </p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Engineered a controller for a smooth differential drive robot to
+                            track nonlinear and time-varying trajectories.</li>
+                        <li class="list-group-item">Optimized controller for Turtlebot3 platform, respecting velocity
+                            constraints by applying LQR techniques.</li>
+                        <li class="list-group-item">Streamlined control system, achieving convergence to the true
+                            trajectory within 2 seconds of receiving a new signal.</li>
+                    </ul>
+                </div>
+            </div>
         </section>
 
-        <section class="project">
-            <h2>Power Consumption Forecasting</h2>
-            <p><strong>Technologies:</strong> PyTorch, Pandas, Neural Networks</p>
-            <ul>
-                <li>Preprocessed a smart meter dataset of 5,000 homes to create optimal input for neural networks using
-                    Pandas.</li>
-                <li>Designed a deep residual network as a baseline for comparison against other neural network models.
-                </li>
-                <li>Developed a CONV-LSTM model that outperformed the baseline XGBoost model while reducing training
-                    time by 90%.</li>
-            </ul>
+        <section class="project mb-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title">Power Consumption Forecasting</h2>
+                    <p class="card-text"><strong>Technologies:</strong> PyTorch, Pandas, Neural Networks</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Preprocessed a smart meter dataset of 5,000 homes to create optimal
+                            input for neural networks using Pandas.</li>
+                        <li class="list-group-item">Designed a deep residual network as a baseline for comparison
+                            against other neural network models.</li>
+                        <li class="list-group-item">Developed a CONV-LSTM model that outperformed the baseline XGBoost
+                            model while reducing training time by 90%.</li>
+                    </ul>
+                </div>
+            </div>
         </section>
 
-        <section class="project">
-            <h2>UAV RRT* Path Planner</h2>
-            <p><strong>Technologies:</strong> ROS2, Python, Controls</p>
-            <ul>
-                <li>Developed a Python UAV simulator with frame transformations and accurate force simulations for
-                    performance analysis.</li>
-                <li>Implemented the RRT* algorithm to enhance the UAV's 2-D pathfinding capabilities over the standard
-                    RRT algorithm.</li>
-                <li>Conducted extensive testing to validate the planner's efficiency and reliability across various
-                    scenarios.</li>
-            </ul>
+        <section class="project mb-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title">UAV RRT* Path Planner</h2>
+                    <p class="card-text"><strong>Technologies:</strong> ROS2, Python, Controls</p>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Developed a Python UAV simulator with frame transformations and
+                            accurate force simulations for performance analysis.</li>
+                        <li class="list-group-item">Implemented the RRT* algorithm to enhance the UAV's 2-D pathfinding
+                            capabilities over the standard RRT algorithm.</li>
+                        <li class="list-group-item">Conducted extensive testing to validate the planner's efficiency and
+                            reliability across various scenarios.</li>
+                    </ul>
+                </div>
+            </div>
         </section>
     </main>
 
-    <footer>
-        <p>&copy; 2024 My Projects Portfolio</p>
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2024 My Projects Portfolio</p>
+        </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
