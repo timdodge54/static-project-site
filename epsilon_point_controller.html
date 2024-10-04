@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epsilon Point Controller</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+    <header class="bg-dark text-white py-4 mb-5">
+        <div class="container">
+            <h1 class="display-4">Epsilon Point Controller of Smooth Differential Drive Model</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="mb-5">
+            <h2>Project Description</h2>
+            <p>This project demonstrates an example of epsilon point control applied to a smooth differential drive model. The controller is implemented in Python, and simulations are carried out in different forms, including basic integration simulations, animations using Matplotlib, and simulations in Gazebo and ROS2.</p>
+        </section>
+
+        <section class="mb-5">
+            <h2>Introduction</h2>
+            <p>The unicycle model is a common state space representation used to express a differential drive robot. The unicycle model state consists of its x and y positions (<i>x<sub>1</sub></i>, <i>x<sub>2</sub></i>), its orientation (&phi;), its forward velocity (&upsilon;), and its angular velocity (&omega;). The state, expressed in vector form, is:</p>
+            <pre><code>x = [x<sub>1</sub>, x<sub>2</sub>, &phi;, &upsilon;, &omega;]</code></pre>
+            <p>The dynamics of this system are defined by:</p>
+            <pre><code>̇x = [&upsilon; cos(&phi;), &upsilon; sin(&phi;), &omega;, a, &alpha;]</code></pre>
+        </section>
+
+        <section class="mb-5">
+            <h2>Why Epsilon Point Control?</h2>
+            <p>The difficulty with controlling this system lies in its "non-holonomic" constraints, which are non-integrable. This system cannot move orthogonal to its current orientation. To alleviate this, we use epsilon point control. The basic idea is to control a point &epsilon; away from the robot's position, bypassing the non-holonomic constraint.</p>
+        </section>
+
+        <section class="mb-5">
+            <h2>Mathematics Behind Epsilon Point Control</h2>
+            <h3>Definition of Epsilon State</h3>
+            <p>We define a point &epsilon; distance away as <i>y<sub>&epsilon;</sub></i>:</p>
+            <pre><code>y<sub>&epsilon;</sub> = [x<sub>1</sub>, x<sub>2</sub>] + &epsilon; [cos(&phi;), sin(&phi;)]</code></pre>
+            <p>To derive the full state, we also take the first and second derivatives of <i>y<sub>&epsilon;</sub></i>:</p>
+            <pre><code>̇y<sub>&epsilon;</sub> = R<sub>&epsilon;</sub> &bar;&upsilon;,  ̇̇y<sub>&epsilon;</sub> = R<sub>&epsilon;</sub> &chi;<sub>&epsilon;</sub> &bar;&upsilon; + R<sub>&epsilon;</sub> &bar;a</code></pre>
+            <p>Where:</p>
+            <pre><code>R<sub>&epsilon;</sub> = [cos(&phi;), -&epsilon; sin(&phi;) ; sin(&phi;), &epsilon; cos(&phi;)]</code></pre>
+        </section>
+
+        <section class="mb-5">
+            <h2>Feedback Linearization</h2>
+            <p>The goal of feedback linearization is to express the control inputs (&bar;a) such that they allow the system to follow the desired path.</p>
+            <pre><code>&bar;a = R<sub>&epsilon;</sub><sup>-1</sup> (̇̇y<sub>&epsilon;</sub> - R<sub>&epsilon;</sub> &chi;<sub>&epsilon;</sub> &bar;&upsilon;)</code></pre>
+        </section>
+
+        <section class="mb-5">
+            <h2>Trajectory Tracking</h2>
+            <p>Trajectory tracking is achieved by defining the desired state of <i>y<sub>&epsilon;</sub></i> and determining its derivatives. For this simulation, the chosen trajectory is:</p>
+            <pre><code>y = [x<sub>1</sub>, x<sub>2</sub>] = [sin(t), t]</code></pre>
+        </section>
+
+        <section class="mb-5">
+            <h2>Matplotlib Animation</h2>
+            <p>A basic animation using Matplotlib was created, utilizing the state of the integrated system to move an arrow around on a blank plot. The results of this simulation are shown below:</p>
+            <img src="figures/new_anim.gif" alt="Matplotlib Animation" class="img-fluid">
+        </section>
+
+        <section class="mb-5">
+            <h2>Gazebo and ROS2 Simulation</h2>
+            <p>The controller code was implemented in the ROS2 framework and simulated in Gazebo. A basic TurtleBot was used, and forward and angular velocities were recalculated using the smooth differential drive model. The results of this simulation are shown below:</p>
+            <img src="figures/ros_cont.gif" alt="Gazebo and ROS2 Simulation" class="img-fluid">
+        </section>
+
+        <section class="mb-5">
+            <h2>Conclusion</h2>
+            <p>This project provided valuable insights into differential drive robots and their control. The application of epsilon point control proved to be effective for trajectory tracking, and it was interesting to implement and observe these techniques in both Gazebo and ROS2. This approach could be promising for controlling real differential drive robots in the future.</p>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2024 Epsilon Point Controller Project</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
