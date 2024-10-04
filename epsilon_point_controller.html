@@ -7,17 +7,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it-katex/dist/markdown-it-katex.min.js"></script>
 </head>
-<script type="text/javascript" src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script type="text/javascript" id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js"></script>
-
 <body class="bg-light">
-<main class="container">
-    <div id="markdown-content"></div>
+    <header class="bg-dark text-white py-4 mb-5">
+        <div class="container">
+            <h1 class="display-4">Epsilon Point Controller of Smooth Differential Drive Model</h1>
+        </div>
+    </header>
 
-    <script type="text/markdown" id="markdown-source">
-    # Epsilon Point Control of the Smooth Differential Drive Model
+    <main class="container">
+        <div id="markdown-content"></div>
+
+        <script type="text/markdown" id="markdown-source">
+            # Epsilon Point Control of the Smooth Differential Drive Model
 
     This is a repo that shows an example of epsilon point control of the smooth differential drive model. The controller is implemented in Python, and simulations are done in three forms. The first is a basic integration simulation to show that the system is working as expected. The second is a matplotlib animation of the system. The third is a simulation in Gazebo and ROS2.
 
@@ -154,16 +159,33 @@
     ```math
     y = \begin{bmatrix}x_1\\x_2\end{bmatrix} = \begin{bmatrix}\sin{t}\\t\end{bmatrix}
     ```
+        </script>
+    </main>
 
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2024 Epsilon Point Controller Project</p>
+        </div>
+    </footer>
+
+    <script>
+      window.onload = function() {
+        // Initialize markdown-it with GitHub Flavored Markdown options
+        var md = window.markdownit({
+          html: true,
+          linkify: true,
+          typographer: true,
+        }).use(window.markdownitKatex);
+
+        // Get Markdown content from script tag
+        var markdownContent = document.getElementById('markdown-source').innerHTML;
+        // Convert Markdown to HTML
+        var htmlContent = md.render(markdownContent);
+        // Set the inner HTML of the container to the converted HTML content
+        document.getElementById('markdown-content').innerHTML = htmlContent;
+      };
     </script>
-<script>
-  window.onload = function() {
-    var converter = new showdown.Converter();
-    var markdownContent = document.getElementById('markdown-source').innerHTML;
-    var htmlContent = converter.makeHtml(markdownContent);
-    document.getElementById('markdown-content').innerHTML = htmlContent;
-  };
-</script>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
