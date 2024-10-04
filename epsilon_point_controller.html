@@ -7,9 +7,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/markdown-it/dist/markdown-it.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/markdown-it-katex/dist/markdown-it-katex.min.js"></script>
 </head>
 <body class="bg-light">
     <header class="bg-dark text-white py-4 mb-5">
@@ -19,147 +16,129 @@
     </header>
 
     <main class="container">
-        <div id="markdown-content"></div>
+    <h1 id="epsilon-point-control-of-the-smooth-differential-drive-model">Epsilon point control of the smooth differential drive model</h1>
+<p>This is repo shows an example of epsilon point control of the smooth differential drive model. The controller is implemented in python and simulations are done in three forms. The first is a basic integration simulation to show that the system is working as expected. The second is a matplotlib animation of the system. The third is a simulation in gazebo and ROS2.</p>
+<h2 id="introduction">Introduction</h2>
+<p>The unicycle model is a common state space representation to express a differential drive robot.
+The unicycle model state consists of its x and y positions $x_1, , x_2$ it&#39;s orientation $\phi$,
+it&#39;s forward velocity $\upsilon$ and it angular velocity $\omega$ This state expressed in vector form is then</p>
+<pre><code class="language-math">x = \begin{bmatrix} x_1 \\ x_2\\ \phi\\ \upsilon\\ \omega\end{bmatrix}$
+</code></pre>
+<p>The dynamics of this system are then defined by $\frac{d}{dx}$ which are expressed by</p>
+<pre><code class="language-math">\dot{x} = \begin{bmatrix}\upsilon\cos{\phi}\\  \upsilon \sin{\phi}\\ \omega \\ a \\ \alpha \end{bmatrix}
+</code></pre>
+<h2 id="why-epsilon-point-control">Why epsilon point control</h2>
+<p>The difficulty with controlling this system is that it contains what is called &quot;non-holonomic&quot; constraints which are non integratable constraints.
+The constraint with this system is that it cannot move orthogonal to it&#39;s current orientation.
+To alleviate this we utilize something called epsilon point control.
+This basic idea is that if a robot is traveling on a path there is a point $\epsilon$ away that does not have that constraint. So instead of trying to control the robots position we control the position of this point.</p>
+<h2 id="math-you-can-skip-this-if-you-want-but-it-is-cool">Math (You can skip this if you want but it is cool!)</h2>
+<h3 id="definition-of-epsilon-state">Definition of epsilon state</h3>
+<p>We can define the point that is $\epsilon$ away as $y_\epsilon$.</p>
+<pre><code class="language-math">y_\epsilon = \begin{bmatrix}x_1\\ x_2\end{bmatrix} + \epsilon \begin{bmatrix}\cos{\phi}\\\sin{\phi}\end{bmatrix}
+</code></pre>
+<p>To get the full state we must also take the first and second derivatives of $y_\epsilon$.</p>
+<pre><code class="language-math">R_{\epsilon} = \begin{bmatrix} \cos{\phi} &amp; - \epsilon\sin{\phi} \\ \sin{\phi} &amp; \epsilon{\cos{\phi}}\end{bmatrix}, \chi_\epsilon = \begin{bmatrix} 0 &amp; - \epsilon\omega \\ \epsilon\omega &amp; 0  \end{bmatrix}, \, \bar{a} = \begin{bmatrix}a\\ \alpha\end{bmatrix}, \, \bar{\upsilon} = \begin{bmatrix}\upsilon\\ \omega\end{bmatrix}
+</code></pre>
+<pre><code class="language-math">\dot{y}_\epsilon = R_{\epsilon}\bar{\upsilon}, \, \ddot{y}_\epsilon = R_{\epsilon} \chi_\epsilon\bar{\upsilon} + R_{\epsilon}\bar{a}$
+</code></pre>
+<h3 id="feedback-linearization">Feedback linearization</h3>
+<p>$\ddot{y}_\epsilon$ is a function of $\bar{a}$ which is the control inputs of the system so solving for this will give us the control inputs that will allow us to follow a path.</p>
+<pre><code class="language-math">\bar{a} = R_{\epsilon}^{-1}(\ddot{y}_\epsilon - R_{\epsilon} \chi_\epsilon\bar{\upsilon})$$
+</code></pre>
+<p>using this we can create an feed back linearized system.</p>
+<pre><code class="language-math">\begin{bmatrix}\dot{y}_\epsilon \\ \ddot{y}_\epsilon\end{bmatrix} = Ay + Bu, \text{ where } y = \begin{bmatrix}y_\epsilon \\ \dot{y}_\epsilon \end{bmatrix}
+</code></pre>
+<pre><code class="language-math">\dot{y} = \begin{bmatrix}
+0 &amp; 0 &amp; 1 &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; 1\\
+0 &amp; 0 &amp; 0 &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; 0
+\end{bmatrix}y + \begin{bmatrix}
+0 &amp; 0\\
+0 &amp; 0\\
+1 &amp; 0\\
+0 &amp; 1\end{bmatrix}u
+</code></pre>
+<h3 id="finding-control-gains-for-the-system">Finding control gains for the system</h3>
+<p>Now that we have a linearized system we can find the control gains for the system. This can be done with either pole placement or LQR. However, since I will eventually be controlling a turtlbot3 robot there and the maimum linear velocity is 0.26 m/s and the maximum angular velocity is 1.82 rad/s I will use LQR to find the control gains. This lends itself to using bryson&#39;s method to define our Q matrix. The gain matrix is found with the following.</p>
+<pre><code class="language-math">k = lqr(A,B,Q,R)\, \text{ where } Q = \begin{bmatrix}1e-6 &amp; 0 &amp; 0 &amp; 0\\
+                                                0 &amp;1e-6 &amp; 0 &amp; 0 \\
+                                                0&amp;0&amp;\frac{1}{.26^2} &amp; 0\\
+                                                0 &amp; 0 &amp; 0 &amp; \frac{1}{1.86^2}
+                                        \end{bmatrix},  R = I \in \mathbb{R}^2$$
+</code></pre>
+<p>The control input for the linearized system is then</p>
+<p>$$ u_y = u_{ff} - k (y - y_{des})$$</p>
+<pre><code class="language-math">u_{ff} = \ddot{y}_\epsilon
+</code></pre>
+<p>$y_{des}$ is the desired state of the system.</p>
+<p>This control can then be converted to the control for the unicycle model by the following equations.</p>
+<pre><code class="language-math">\begin{bmatrix}a\\ \alpha\end{bmatrix} = R_{\epsilon}^{-1} u_y - \hat{\omega}\bar{v}
+</code></pre>
+<h3 id="converting-unicycle-to-smooth-differential-drive">Converting Unicycle to Smooth Differential Drive</h3>
+<p>The unicycle model is not the most realistic model of a differential drive robot. In reality we need to control the rotation for each of the robots wheels. The smooth differential drive model is similar to the unicycle model but just swaps the velocity terms for left and right wheel velocities. The smooth differential drive model is defined by the following equations.</p>
+<p> $$
+ \dot{x} = \begin{bmatrix}
+        \frac{r}{2}(w_r+w_t)\cos(\theta)\
+        \frac{r}{2}(w_r+w_t)\sin{\theta}\
+        \frac{r}{L}(w_r-w_l)\
+        u_r\
+        u_l
+    \end{bmatrix}, , \begin{bmatrix}
+        v = \frac{r}{2}(w_r + w_)\
+        w = \frac{r}{L}(w_r-w_l)
+    \end{bmatrix}
+    ,, x = \begin{bmatrix}
+        q_1\
+        q_2\
+        \theta\
+        w_r\
+        w_l
+    \end{bmatrix}
+$$</p>
+<p>The conversion can be done by solving for the setting $u_r$ and $u_l$ equal to the derivative of the second vector $v$ and $w$ above and solving for $u_r$ and $u_l$.</p>
+<p>Skipping some algebra the control inputs for the smooth differential drive model are</p>
+<p>$$u_r = \frac{a}{r} - \frac{L}{2r}\alpha, , u_l = \frac{a}{r} + \frac{L}{2r}\alpha$$</p>
+<h2 id="trajectory-tracking">Trajectory tracking</h2>
+<p>Trajectory tracking is done by defining the desired state of the $y_\epsilon$ system and finding its first and second derivatives. For this simulation I choose the trajectory to be</p>
+<pre><code class="language-math">y = \begin{bmatrix}x_1\\x_2\end{bmatrix} = \begin{bmatrix}\sin{t}\\t\end{bmatrix}
+</code></pre>
+<h2 id="basic-integration-simulation">Basic Integration Simulation</h2>
+<p>Before using a simulation of the system a basic integration simulation was done to make sure that the system was working as expected. The results of this simulation are shown below.</p>
+<p><img src="./figures/approx_drive.png" alt="Basic Integration Simulation"></p>
+<p>This is shows that behavior of the system is as expected as time goes on the trajectory converges.</p>
+<h2 id="matplotlib-animation">MatPlotLib Animation</h2>
+<p>Next i created a basic animation using matplotlib where I utilize the state of the integrated system to move an arrow around on a blank plot. The results of this simulation are shown below.</p>
+<p><img src="./figures/new_anim.gif" alt="MatPlotLib Animation"></p>
+<p>A little more interesting than a plot but still not very exciting.</p>
+<h2 id="gazebo-and-ros2-simulation">Gazebo and ROS2 Simulation</h2>
+<p>Next I took the controller code and implemented into the ROS2 framework and simulated it in gazebo. I used a basic turtle bot and recalulated the forward and angular velocity of the turtle bot using the smooth differential drive model and published this on the cmd_vel topic. The results of this simulation are shown below.</p>
+<p><img src="./figures/ros_cont.gif" alt="Gazebo and ROS2 Simulation"></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>This was a fun project and I learned a lot about differential drive robots and how to control them. I also learned a lot about ROS2 and gazebo. I think that this is a good way to control a differential drive robot and I think that it would be interesting to see how this would work on a real robot.</p>
+<h2 id="installation-and-running-ros2-simulation">Installation and Running ROS2 Simulation</h2>
+<p>The ros simulation requires ROS2 humble and gazebo 11. To install ROS2 follow the instructions <a href="https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html">here</a>. To install gazebo 11 follow the instructions <a href="http://gazebosim.org/tutorials?tut=install_ubuntu&cat=install">here</a>. Once these are installed you can clone this repo into your ros workspace and run the following commands.</p>
+<p>To download the package create a ros workspace and clone this repo into the src folder.</p>
+<pre><code class="language-bash">mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+git clone https://github.com/timdodge54/epsilon_point_control.git
+</code></pre>
+<p>Install python dependencies</p>
+<pre><code class="language-bash">pip3 install -r requirements.txt
+</code></pre>
+<p>Then build the package</p>
+<pre><code class="language-bash">cd ../..
+colcon build --symlink-install
+</code></pre>
+<p>Then source the package</p>
+<pre><code class="language-bash">source install/setup.bash
+</code></pre>
+<p>Then run the ros2 simulation</p>
+<pre><code class="language-bash">export TURTLEBOT3_MODEL=burger
+ros2 launch epsilon_control launch_controller_turtle_sim.launch.py
+</code></pre>
 
-        <script type="text/markdown" id="markdown-source">
-            # Epsilon Point Control of the Smooth Differential Drive Model
-
-    This is a repo that shows an example of epsilon point control of the smooth differential drive model. The controller is implemented in Python, and simulations are done in three forms. The first is a basic integration simulation to show that the system is working as expected. The second is a matplotlib animation of the system. The third is a simulation in Gazebo and ROS2.
-
-    ## Introduction
-
-    The unicycle model is a common state space representation to express a differential drive robot.
-    The unicycle model state consists of its x and y positions $x_1, \, x_2$, its orientation $\phi$,
-    its forward velocity $\upsilon$, and its angular velocity $\omega$. This state expressed in vector form is then:
-
-    ```math
-    x = \begin{bmatrix} x_1 \\ x_2\\ \phi\\ \upsilon\\ \omega\end{bmatrix}
-    ```
-
-    The dynamics of this system are then defined by $\frac{d}{dx}$ which are expressed by:
-
-    ```math
-    \dot{x} = \begin{bmatrix}\upsilon\cos{\phi}\\  \upsilon \sin{\phi}\\ \omega \\ a \\ \alpha \end{bmatrix}
-    ```
-
-    ## Why Epsilon Point Control
-
-    The difficulty with controlling this system is that it contains what are called "non-holonomic" constraints, which are non-integrable. The constraint with this system is that it cannot move orthogonal to its current orientation. To alleviate this, we utilize something called epsilon point control. The basic idea is that if a robot is traveling on a path, there is a point $\epsilon$ away that does not have that constraint. Instead of trying to control the robot's position, we control the position of this point.
-
-    ## Math (You can skip this if you want but it is cool!)
-
-    ### Definition of Epsilon State
-
-    We can define the point that is $\epsilon$ away as $y_\epsilon$.
-
-    ```math
-    y_\epsilon = \begin{bmatrix}x_1\\ x_2\end{bmatrix} + \epsilon \begin{bmatrix}\cos{\phi}\\\sin{\phi}\end{bmatrix}
-    ```
-
-    To get the full state, we must also take the first and second derivatives of $y_\epsilon$.
-
-    ```math
-    R_{\epsilon} = \begin{bmatrix} \cos{\phi} & - \epsilon\sin{\phi} \\ \sin{\phi} & \epsilon\cos{\phi}\end{bmatrix}, \chi_\epsilon = \begin{bmatrix} 0 & - \epsilon\omega \\ \epsilon\omega & 0  \end{bmatrix}, \, \bar{a} = \begin{bmatrix}a\\ \alpha\end{bmatrix}, \, \bar{\upsilon} = \begin{bmatrix}\upsilon\\ \omega\end{bmatrix}
-    ```
-
-    ```math
-    \dot{y}_\epsilon = R_{\epsilon}\bar{\upsilon}, \, \ddot{y}_\epsilon = R_{\epsilon} \chi_\epsilon\bar{\upsilon} + R_{\epsilon}\bar{a}
-    ```
-
-    ### Feedback Linearization
-
-    $\ddot{y}_\epsilon$ is a function of $\bar{a}$, which are the control inputs of the system, so solving for this will give us the control inputs that will allow us to follow a path.
-
-    ```math
-    \bar{a} = R_{\epsilon}^{-1}(\ddot{y}_\epsilon - R_{\epsilon} \chi_\epsilon\bar{\upsilon})
-    ```
-
-    Using this, we can create a feedback linearized system.
-
-    ```math
-    \begin{bmatrix}\dot{y}_\epsilon \\ \ddot{y}_\epsilon\end{bmatrix} = Ay + Bu, \text{ where } y = \begin{bmatrix}y_\epsilon \\ \dot{y}_\epsilon \end{bmatrix}
-    ```
-
-    ```math
-    \dot{y} = \begin{bmatrix}
-    0 & 0 & 1 & 0\\
-    0 & 0 & 0 & 1\\
-    0 & 0 & 0 & 0\\
-    0 & 0 & 0 & 0
-    \end{bmatrix}y + \begin{bmatrix}
-    0 & 0\\
-    0 & 0\\
-    1 & 0\\
-    0 & 1\end{bmatrix}u
-    ```
-
-    ### Finding Control Gains for the System
-
-    Now that we have a linearized system, we can find the control gains for the system. This can be done with either pole placement or LQR. Since we will eventually be controlling a TurtleBot3 robot, where the maximum linear velocity is 0.26 m/s and the maximum angular velocity is 1.82 rad/s, we use LQR to find the control gains. This lends itself to using Bryson's method to define our Q matrix. The gain matrix is found with the following.
-
-    ```math
-    k = lqr(A,B,Q,R), \text{ where } Q = \begin{bmatrix}1e-6 & 0 & 0 & 0\\
-                                            0 &1e-6 & 0 & 0 \\
-                                            0&0&\frac{1}{.26^2} & 0\\
-                                            0 & 0 & 0 & \frac{1}{1.86^2}
-                                     \end{bmatrix},  R = I \in \mathbb{R}^2
-    ```
-
-    The control input for the linearized system is then
-
-    ```math
-    u_y = u_{ff} - k (y - y_{des})
-    ```
-
-    ```math
-    u_{ff} = \ddot{y}_\epsilon
-    ```
-
-    $y_{des}$ is the desired state of the system.
-
-    This control can then be converted to the control for the unicycle model by the following equations.
-
-    ```math
-    \begin{bmatrix}a\\ \alpha\end{bmatrix} = R_{\epsilon}^{-1} u_y - \hat{\omega}\bar{v}
-    ```
-
-    ### Converting Unicycle to Smooth Differential Drive
-
-    The unicycle model is not the most realistic model of a differential drive robot. In reality, we need to control the rotation for each of the robot's wheels. The smooth differential drive model is similar to the unicycle model but just swaps the velocity terms for left and right wheel velocities. The smooth differential drive model is defined by the following equations.
-
-    ```math
-    \dot{x} = \begin{bmatrix}
-           \frac{r}{2}(w_r+w_t)\cos(\theta)\\
-           \frac{r}{2}(w_r+w_t)\sin{\theta}\\
-           \frac{r}{L}(w_r-w_l)\\
-           u_r\\
-           u_l
-       \end{bmatrix}, \, \begin{bmatrix}
-           v = \frac{r}{2}(w_r + w_l)\\
-           w = \frac{r}{L}(w_r-w_l)
-       \end{bmatrix},\, x = \begin{bmatrix}
-           q_1\\
-           q_2\\
-           \theta\\
-           w_r\\
-           w_l
-       \end{bmatrix}
-    ```
-
-    Skipping some algebra, the control inputs for the smooth differential drive model are
-
-    ```math
-    u_r = \frac{a}{r} - \frac{L}{2r}\alpha, \, u_l = \frac{a}{r} + \frac{L}{2r}\alpha
-    ```
-
-    ## Trajectory Tracking
-
-    Trajectory tracking is done by defining the desired state of the $y_\epsilon$ system and finding its first and second derivatives. For this simulation, the chosen trajectory is
-
-    ```math
-    y = \begin{bmatrix}x_1\\x_2\end{bmatrix} = \begin{bmatrix}\sin{t}\\t\end{bmatrix}
-    ```
-        </script>
     </main>
 
     <footer class="bg-dark text-white py-4 mt-5">
@@ -167,24 +146,6 @@
             <p>&copy; 2024 Epsilon Point Controller Project</p>
         </div>
     </footer>
-
-    <script>
-      window.onload = function() {
-        // Initialize markdown-it with GitHub Flavored Markdown options
-        var md = window.markdownit({
-          html: true,
-          linkify: true,
-          typographer: true,
-        }).use(window.markdownitKatex);
-
-        // Get Markdown content from script tag
-        var markdownContent = document.getElementById('markdown-source').innerHTML;
-        // Convert Markdown to HTML
-        var htmlContent = md.render(markdownContent);
-        // Set the inner HTML of the container to the converted HTML content
-        document.getElementById('markdown-content').innerHTML = htmlContent;
-      };
-    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
