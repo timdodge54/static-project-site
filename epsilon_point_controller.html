@@ -33,11 +33,9 @@
 <p>The unicycle model is a common state space representation to express a differential drive robot.
 The unicycle model state consists of its x and y positions $x_1, , x_2$ it&#39;s orientation $\phi$,
 it&#39;s forward velocity $\upsilon$ and it angular velocity $\omega$ This state expressed in vector form is then</p>
-<pre><code class="language-math">x = \begin{bmatrix} x_1 \\ x_2\\ \phi\\ \upsilon\\ \omega\end{bmatrix}$
-</code></pre>
+<p>$$x = \begin{bmatrix} x_1 \\ x_2\\ \phi\\ \upsilon\\ \omega\end{bmatrix}$$</p>
 <p>The dynamics of this system are then defined by $\frac{d}{dx}$ which are expressed by</p>
-<pre><code class="language-math">\dot{x} = \begin{bmatrix}\upsilon\cos{\phi}\\  \upsilon \sin{\phi}\\ \omega \\ a \\ \alpha \end{bmatrix}
-</code></pre>
+<p>$$\dot{x} = \begin{bmatrix}\upsilon\cos{\phi}\\  \upsilon \sin{\phi}\\ \omega \\ a \\ \alpha \end{bmatrix}$$</p>
 <h2 id="why-epsilon-point-control">Why epsilon point control</h2>
 <p>The difficulty with controlling this system is that it contains what is called &quot;non-holonomic&quot; constraints which are non integratable constraints.
 The constraint with this system is that it cannot move orthogonal to it&#39;s current orientation.
@@ -46,21 +44,20 @@ This basic idea is that if a robot is traveling on a path there is a point $\eps
 <h2 id="math-you-can-skip-this-if-you-want-but-it-is-cool">Math (You can skip this if you want but it is cool!)</h2>
 <h3 id="definition-of-epsilon-state">Definition of epsilon state</h3>
 <p>We can define the point that is $\epsilon$ away as $y_\epsilon$.</p>
-<pre><code class="language-math">y_\epsilon = \begin{bmatrix}x_1\\ x_2\end{bmatrix} + \epsilon \begin{bmatrix}\cos{\phi}\\\sin{\phi}\end{bmatrix}
-</code></pre>
+<p>$$y_\epsilon = \begin{bmatrix}x_1\\ x_2\end{bmatrix} + \epsilon \begin{bmatrix}\cos{\phi}\\\sin{\phi}\end{bmatrix}$$</p>
 <p>To get the full state we must also take the first and second derivatives of $y_\epsilon$.</p>
-<pre><code class="language-math">R_{\epsilon} = \begin{bmatrix} \cos{\phi} &amp; - \epsilon\sin{\phi} \\ \sin{\phi} &amp; \epsilon{\cos{\phi}}\end{bmatrix}, \chi_\epsilon = \begin{bmatrix} 0 &amp; - \epsilon\omega \\ \epsilon\omega &amp; 0  \end{bmatrix}, \, \bar{a} = \begin{bmatrix}a\\ \alpha\end{bmatrix}, \, \bar{\upsilon} = \begin{bmatrix}\upsilon\\ \omega\end{bmatrix}
-</code></pre>
-<pre><code class="language-math">\dot{y}_\epsilon = R_{\epsilon}\bar{\upsilon}, \, \ddot{y}_\epsilon = R_{\epsilon} \chi_\epsilon\bar{\upsilon} + R_{\epsilon}\bar{a}$
-</code></pre>
+<p>$$</code>R_{\epsilon} = \begin{bmatrix} \cos{\phi} &amp; - \epsilon\sin{\phi} \\ \sin{\phi} &amp; \epsilon{\cos{\phi}}\end{bmatrix}, \chi_\epsilon = \begin{bmatrix} 0 &amp; - \epsilon\omega \\ \epsilon\omega &amp; 0  \end{bmatrix}, \, \bar{a} = \begin{bmatrix}a\\ \alpha\end{bmatrix}, \, \bar{\upsilon} = \begin{bmatrix}\upsilon\\ \omega\end{bmatrix}
+$$</p>
+<p>$$\dot{y}_\epsilon = R_{\epsilon}\bar{\upsilon}, \, \ddot{y}_\epsilon = R_{\epsilon} \chi_\epsilon\bar{\upsilon} + R_{\epsilon}\bar{a}$
+$$</p>
 <h3 id="feedback-linearization">Feedback linearization</h3>
 <p>$\ddot{y}_\epsilon$ is a function of $\bar{a}$ which is the control inputs of the system so solving for this will give us the control inputs that will allow us to follow a path.</p>
-<pre><code class="language-math">\bar{a} = R_{\epsilon}^{-1}(\ddot{y}_\epsilon - R_{\epsilon} \chi_\epsilon\bar{\upsilon})$$
-</code></pre>
+<p>$$\bar{a} = R_{\epsilon}^{-1}(\ddot{y}_\epsilon - R_{\epsilon} \chi_\epsilon\bar{\upsilon})$$
+$$</p>
 <p>using this we can create an feed back linearized system.</p>
-<pre><code class="language-math">\begin{bmatrix}\dot{y}_\epsilon \\ \ddot{y}_\epsilon\end{bmatrix} = Ay + Bu, \text{ where } y = \begin{bmatrix}y_\epsilon \\ \dot{y}_\epsilon \end{bmatrix}
-</code></pre>
-<pre><code class="language-math">\dot{y} = \begin{bmatrix}
+<p>$$\begin{bmatrix}\dot{y}_\epsilon \\ \ddot{y}_\epsilon\end{bmatrix} = Ay + Bu, \text{ where } y = \begin{bmatrix}y_\epsilon \\ \dot{y}_\epsilon \end{bmatrix}
+$$</p>
+<p>$$\dot{y} = \begin{bmatrix}
 0 &amp; 0 &amp; 1 &amp; 0\\
 0 &amp; 0 &amp; 0 &amp; 1\\
 0 &amp; 0 &amp; 0 &amp; 0\\
@@ -70,23 +67,23 @@ This basic idea is that if a robot is traveling on a path there is a point $\eps
 0 &amp; 0\\
 1 &amp; 0\\
 0 &amp; 1\end{bmatrix}u
-</code></pre>
+$$</p>
 <h3 id="finding-control-gains-for-the-system">Finding control gains for the system</h3>
 <p>Now that we have a linearized system we can find the control gains for the system. This can be done with either pole placement or LQR. However, since I will eventually be controlling a turtlbot3 robot there and the maimum linear velocity is 0.26 m/s and the maximum angular velocity is 1.82 rad/s I will use LQR to find the control gains. This lends itself to using bryson&#39;s method to define our Q matrix. The gain matrix is found with the following.</p>
-<pre><code class="language-math">k = lqr(A,B,Q,R)\, \text{ where } Q = \begin{bmatrix}1e-6 &amp; 0 &amp; 0 &amp; 0\\
+<p>$$k = lqr(A,B,Q,R)\, \text{ where } Q = \begin{bmatrix}1e-6 &amp; 0 &amp; 0 &amp; 0\\
                                                 0 &amp;1e-6 &amp; 0 &amp; 0 \\
                                                 0&amp;0&amp;\frac{1}{.26^2} &amp; 0\\
                                                 0 &amp; 0 &amp; 0 &amp; \frac{1}{1.86^2}
                                         \end{bmatrix},  R = I \in \mathbb{R}^2$$
-</code></pre>
+$$</p>
 <p>The control input for the linearized system is then</p>
 <p>$$ u_y = u_{ff} - k (y - y_{des})$$</p>
-<pre><code class="language-math">u_{ff} = \ddot{y}_\epsilon
-</code></pre>
+<p>$$u_{ff} = \ddot{y}_\epsilon
+$$</p>
 <p>$y_{des}$ is the desired state of the system.</p>
 <p>This control can then be converted to the control for the unicycle model by the following equations.</p>
-<pre><code class="language-math">\begin{bmatrix}a\\ \alpha\end{bmatrix} = R_{\epsilon}^{-1} u_y - \hat{\omega}\bar{v}
-</code></pre>
+<p>$$\begin{bmatrix}a\\ \alpha\end{bmatrix} = R_{\epsilon}^{-1} u_y - \hat{\omega}\bar{v}
+$$</p>
 <h3 id="converting-unicycle-to-smooth-differential-drive">Converting Unicycle to Smooth Differential Drive</h3>
 <p>The unicycle model is not the most realistic model of a differential drive robot. In reality we need to control the rotation for each of the robots wheels. The smooth differential drive model is similar to the unicycle model but just swaps the velocity terms for left and right wheel velocities. The smooth differential drive model is defined by the following equations.</p>
 <p> $$
@@ -113,8 +110,7 @@ $$</p>
 <p>$$u_r = \frac{a}{r} - \frac{L}{2r}\alpha, , u_l = \frac{a}{r} + \frac{L}{2r}\alpha$$</p>
 <h2 id="trajectory-tracking">Trajectory tracking</h2>
 <p>Trajectory tracking is done by defining the desired state of the $y_\epsilon$ system and finding its first and second derivatives. For this simulation I choose the trajectory to be</p>
-<pre><code class="language-math">y = \begin{bmatrix}x_1\\x_2\end{bmatrix} = \begin{bmatrix}\sin{t}\\t\end{bmatrix}
-</code></pre>
+<p>$$y = \begin{bmatrix}x_1\\x_2\end{bmatrix} = \begin{bmatrix}\sin{t}\\t\end{bmatrix}$$</p>
 <h2 id="basic-integration-simulation">Basic Integration Simulation</h2>
 <p>Before using a simulation of the system a basic integration simulation was done to make sure that the system was working as expected. The results of this simulation are shown below.</p>
 <p><img src="./figures/approx_drive.png" alt="Basic Integration Simulation"></p>
