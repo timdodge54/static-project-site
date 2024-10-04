@@ -21,23 +21,6 @@
             <p>This project is extending on work from the USU ECE 5330 class to create an RRT* planner. The primary goal of RRT* is to provide better heuristics for connecting new nodes to graphs that are not greedy in nature, unlike traditional RRT. These improved connection heuristics allow RRT* to converge on true optimality as time goes to infinity, whereas traditional RRT does not provide such a guarantee. The implementation of Straight Line RRT can cause winding paths that can never converge on the optimal solution. Modifying the Straight Line RRT algorithm is beneficial for UAV planning. The main benefit is that the paths produced by the RRT* planner provide straighter and more energy-efficient paths that are easier to follow. This allows a given UAV to traverse more ground and waste less energy traversing a specified area.</p>
         </section>
 
-        <section class="mb-5">
-            <h2>Running RRT* Planner in Python</h2>
-            <p>To run the code in Python, the package must first be installed. This can be done by running the following commands in the terminal:</p>
-            <pre><code>cd src/mavsim_python
-pip3 install -e .</code></pre>
-            <p>After the package is installed, the planner can be run by running the following command in the terminal:</p>
-            <pre><code>python3 mav_sim/final_project/run_final_project.py</code></pre>
-        </section>
-
-        <section class="mb-5">
-            <h2>Running RRT* Planner in ROS</h2>
-            <p>After the Python package is installed, verify that you have ROS2 Humble Haskell installed. If you do not have ROS2 installed, follow the instructions on the ROS2 website to install it. After ROS2 is installed, the package can be built by running the following commands in the terminal:</p>
-            <pre><code>cd ../..
-colcon build
-source install/setup.bash
-ros2 launch uav_launch final_path_planner.launch.py</code></pre>
-        </section>
 
         <section class="mb-5">
             <h2>Project Details</h2>
