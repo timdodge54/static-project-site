@@ -31,7 +31,10 @@
             <section id="description">
                 <h2>Description of Code</h2>
                 <p>The overall node structure is shown in the figure below:</p>
-                <img src="figures/node_struct.png" alt="Node Structure">
+                <div class="text-center">
+                    <img src="figures/node_struct.png" alt="Node Structure" class="img-fluid" style="max-width: 100%;">
+                </div>
+
                 <p>The main ROS node that performs all calculations is the power node. Several of these nodes can run
                     simultaneously. Each node passes its information to a filter node, which waits for all nodes to
                     execute
