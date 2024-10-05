@@ -19,7 +19,30 @@
 </head>
 <body class="bg-light">
     <main class="container content bg-white shadow-sm p-4 my-5 rounded">
-        <h1>Connected Communities Simulated Annealing</h1>
+        <p>Simulated annealing is a probabilistic optimization algorithm inspired by the annealing process in metallurgy. It is used to find an approximate solution to complex optimization problems by exploring the solution space in a way that allows for occasional uphill moves, helping avoid local minima and increasing the chances of finding a global minimum.</p>
+
+        
+
+        <section id="description">
+            <h2>Description of Code</h2>
+            <p>The overall node structure is shown in the figure below:</p>
+            <img src="figures/node_struct.png" alt="Node Structure">
+            <p>The main ROS node that performs all calculations is the power node. Several of these nodes can run simultaneously. Each node passes its information to a filter node, which waits for all nodes to execute and then passes the information to the plotter node. The planner class is responsible for generating and accepting new solutions. It houses both a greedy and a Simulated Annealing planner.</p>
+            <img src="figures/planner.png" alt="Planner">
+            <p>Within the planner class, solutions are held. The diagram for the solution class is shown below:</p>
+            <img src="figures/power_sol.png" alt="Power Solution">
+            <ul>
+                <li><strong>EnergyTimeSlots:</strong> This data member tracks the SOC of the battery over time. Each index of this data member stores the conservative power estimate defined and the accumulated energy based on the power and energy of the previous index within the <code>EnergyTimeSlots</code> data member.</li>
+                <li><strong>Event Map:</strong> This is a hash map that associates event IDs with a struct containing information such as event ID, power, start time, and end time.</li>
+            </ul>
+        </section>
+
+        <section id="running-code">
+            <h2>Running the Code</h2>
+            <p>To run the <code>BatteryAggregateBrute</code> class and see the overall timing as well as the average timing of adding and removing events, run the following command:</p>
+            <pre><code>ros2 launch power_energy_propogation test_battery_aggregation_brute.launch.py</code></pre>
+        </section>
+
 
         <section id="getting-started">
             <h2>Getting Started</h2>
@@ -55,39 +78,6 @@ wstool up
             <h3>Building the Code</h3>
             <p>For all other builds, the following alias can be used. It will source the environment and build the code:</p>
             <pre><code>alias build='source venv/bin/activate && colcon build --symlink-install && . install/setup.bash'</code></pre>
-        </section>
-
-        <section id="description">
-            <h2>Description of Code</h2>
-            <p>The overall node structure is shown in the figure below:</p>
-            <img src="figures/node_struct.png" alt="Node Structure">
-            <p>The main ROS node that performs all calculations is the power node. Several of these nodes can run simultaneously. Each node passes its information to a filter node, which waits for all nodes to execute and then passes the information to the plotter node. The planner class is responsible for generating and accepting new solutions. It houses both a greedy and a Simulated Annealing planner.</p>
-            <img src="figures/planner.png" alt="Planner">
-            <p>Within the planner class, solutions are held. The diagram for the solution class is shown below:</p>
-            <img src="figures/power_sol.png" alt="Power Solution">
-            <ul>
-                <li><strong>EnergyTimeSlots:</strong> This data member tracks the SOC of the battery over time. Each index of this data member stores the conservative power estimate defined and the accumulated energy based on the power and energy of the previous index within the <code>EnergyTimeSlots</code> data member.</li>
-                <li><strong>Event Map:</strong> This is a hash map that associates event IDs with a struct containing information such as event ID, power, start time, and end time.</li>
-            </ul>
-        </section>
-
-        <section id="running-code">
-            <h2>Running the Code</h2>
-            <p>To run the <code>BatteryAggregateBrute</code> class and see the overall timing as well as the average timing of adding and removing events, run the following command:</p>
-            <pre><code>ros2 launch power_energy_propogation test_battery_aggregation_brute.launch.py</code></pre>
-        </section>
-
-        <section id="results">
-            <h2>Results</h2>
-            <h3>Greedy Results</h3>
-            <img src="figures/Greedy.png" alt="Greedy Results">
-
-            <h3>Simulated Annealing Results</h3>
-            <img src="figures/SA.png" alt="Simulated Annealing Results">
-
-            <h3>Results with Multiple Batteries</h3>
-            <img src="figures/greedy_results.png" alt="Greedy Results with Multiple Batteries">
-            <img src="figures/fitness_resutls_greedy.png" alt="Fitness Results for Greedy Approach">
         </section>
     </main>
 
