@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realtime Visualization Tutorial</title>
+    <link rel="icon" href="figures/robo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+
+<body class="bg-light">
+    <header class="bg-dark text-white py-4 mb-5">
+        <div class="container">
+            <h1 class="display-4">Using Matplotlib with Threading in Python for Real-Time Data Visualization</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="mb-5">
+            <h2>Explanation of Threading and Matplotlib</h2>
+            <p>Matplotlib requires synchronous plotting functionality to occur on the main thread. Within ROS, anything
+                that is executed in a timer or callback is run on a secondary thread. This means that if a user attempts
+                to plot regularly from information retrieved from either a service-client or publisher-subscriber,
+                manual pushing of the plotting to the main thread is required to allow for the images to be displayed.
+            </p>
+            <p>To explain how to achieve this, two examples are provided. The first example shows how threading can be
+                implemented without ROS, explaining what happens on the Python side. The second example follows similar
+                logic but is implemented in ROS2, showing what changes are specific to ROS.</p>
+        </section>
+
+        <section class="mb-5">
+            <h2>Example of Threading Without ROS</h2>
+            <pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.animation as anim
+import threading
+import time
+
+class Tester:
+    """Example of how to use matplotlib with threading."""
+
+    def __init__(self):
+        self.fig, self.ax = plt.subplots()
+        self.plt_x = [i for i in range(5)]
+        self.plt_width = [0.5 for i in range(5)]
+        self.plt_counter = 0
+        self._lock = threading.Lock()
+
+    def plt_func(self, _):
+        with self._lock:
+            x = np.array(self.plt_x)
+            y = np.array(self.plt_width)
+            self.ax.barh(y, 0.5, left=x, color="red")
+            return self.ax
+
+    def loop_logic(self):
+        time.sleep(3)
+        while True:
+            self.plt_add()
+            time.sleep(1)
+
+    def plt_add(self):
+        with self._lock:
+            if self.plt_counter > 4:
+                self.plt_x.append(self.plt_counter)
+                self.plt_width.append(0.5)
+            self.plt_counter += 1
+
+    def _plt(self):
+        self.ani = anim.FuncAnimation(self.fig, self.plt_func, interval=1000)
+        plt.show()
+
+if __name__ == "__main__":
+    test = Tester()
+    thread = threading.Thread(target=test.loop_logic)
+    thread.start()
+    test._plt()</code></pre>
+        </section>
+
+        <section class="mb-5">
+            <h2>Explanation of Example 1</h2>
+            <p>In this example, the <code>Tester</code> class simulates a node class as if used in ROS. The
+                <code>init</code> function initializes a Matplotlib figure and axis, which are continually updated
+                throughout the class lifecycle. The x and y member variables are initialized to demonstrate updating
+                existing data, and a threading lock is created to prevent simultaneous data access. </p>
+            <p>The <code>loop_logic</code> function starts by adding data to the x and y member variables every three
+                seconds. This loop logic calls a second function, <code>plt_add</code>, which uses the threading lock
+                <code>_lock</code> to add data to these variables.</p>
+            <p>The <code>FuncAnimation</code> function is used to continuously update the axis with new data, allowing
+                for the figure to refresh with the given interval. The callable used by <code>FuncAnimation</code> must
+                return the axis that will update the figure.</p>
+        </section>
+
+        <section class="mb-5">
+            <h2>Example Using ROS</h2>
+            <pre><code class="language-python">#! /usr/bin/env python3
+
+import threading
+import typing
+
+import matplotlib.pyplot as plt
+import matplotlib.animation as anim
+import numpy as np
+import rclpy
+from test_msg.msg import Test
+from rclpy.subscription import Subscription
+from rclpy.node import Node
+
+class Example_Node(Node):
+    """Example Node for showing how to use matplotlib within a ROS2 node"""
+
+    def __init__(self):
+        super().__init__("example_node")
+        self.fig, self.ax = plt.subplots()
+        self._lock = threading.Lock()
+        self.x = [i for i in range(5)]
+        self.width = [0.5 for i in range(5)]
+        self._sub = self.create_subscription(Test, "test", self._callback, 10)
+
+    def _callback(self, msg: Test):
+        with self._lock:
+            number: int = msg.num
+            self.x.append(number)
+            self.width.append(0.5)
+
+    def plt_func(self, _):
+        with self._lock:
+            x = np.array(self.x)
+            y = np.array(self.width)
+            self.ax.barh(y, 0.5, left=x, color="red")
+            return self.ax
+
+    def _plt(self):
+        self.ani = anim.FuncAnimation(self.fig, self.plt_func, interval=1000)
+        plt.show()
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = Example_Node()
+    executor = rclpy.executors.MultiThreadedExecutor()
+    executor.add_node(node)
+    thread = threading.Thread(target=executor.spin, daemon=True)
+    thread.start()
+    node._plt()
+
+if __name__ == "__main__":
+    main()</code></pre>
+        </section>
+
+        <section class="mb-5">
+            <h2>Major Differences Between Example 1 and 2</h2>
+            <p>The main change is that the <code>loop_logic</code> function from the first example becomes a callback
+                for the subscriber in this example. In the main function, a multi-threaded executor is created, and the
+                node is added to the executor. The executor's spinning is placed in a thread with
+                <code>daemon=True</code> to allow ROS2 to execute smoothly.</p>
+        </section>
+
+        <section class="mb-5">
+            <h2>Location of Examples and How to Run</h2>
+            <p>The example code can be found within the <code>src</code> folder of this repository. To run the examples,
+                first clone the repository, then build the package using colcon. The following commands will install the
+                required dependencies, build the package, and run the example.</p>
+            <pre><code class="language-bash">cd "repository"
+source /opt/ros/$ROSDISTRO/setup.bash
+pip install -r requirements.txt
+colcon build
+. install/setup.bash
+ros2 launch test_plot test.launch.py</code></pre>
+        </section>
+
+        <section class="mb-5">
+            <h2>Boiler Plate Code</h2>
+            <p>Boiler plate code for plotting can be found on my profile and can be cloned using the following command:
+            </p>
+            <pre><code class="language-bash">git clone https://github.com/timdodge54/boiler_plate_plotting.git</code></pre>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2024 Realtime Visualization Tutorial</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
