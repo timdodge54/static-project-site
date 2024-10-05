@@ -4,79 +4,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAV RRT* Path Planner</title>
+    <title>Sandia National Laboratories: Pursuer-Evader Project</title>
     <link rel="icon" href="figures/robo.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .image-container {
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .image-container img {
+            width: 75%;
+            max-width: 600px;
+            height: auto;
+        }
+    </style>
 </head>
 
 <body class="bg-light">
     <header class="bg-dark text-white py-4 mb-5">
         <div class="container">
             <h1 class="display-4">Sandia National Laboratories: Pursuer-Evader Project</h1>
+            <p class="lead">This page provides a detailed overview of my work on the Pursuer-Evader Project at Sandia
+                National Laboratories, highlighting key contributions and outcomes.</p>
         </div>
     </header>
 
-    <body>
-        <header class="bg-dark text-white py-4 mb-5">
-            <div class="container">
-                <h1 class="display-4">Sandia National Laboratories: Pursuer-Evader Project</h1>
-                <p class="lead">This page provides a detailed overview of my work on the Pursuer-Evader Project at
-                    Sandia
-                    National Laboratories, highlighting key contributions and outcomes.</p>
+    <main class="content">
+        <section class="mb-5">
+            <p>During my time at Sandia National Laboratories, I developed reinforcement learning models specifically
+                designed for the pursuer team in pursuer-evader problems. The primary goal was to create a model that
+                could effectively surpass the ProNav baseline, which has long been considered the benchmark in
+                pursuit-evasion tasks. Using PyTorch, I was able to successfully implement and train these models to
+                significantly outperform the traditional guidance laws. This achievement demonstrated the potential of
+                reinforcement learning in real-time decision-making for dynamic environments.</p>
+            <div class="image-container">
+                <img src="figures/vicon.png" alt="Vicon System Visualization">
             </div>
-        </header>
-
-        <main class="content">
-            <section class="mb-5">
-                <p>During my time at Sandia National Laboratories, I developed reinforcement learning models
-                    specifically
-                    designed for the pursuer team in pursuer-evader problems. The primary goal was to create a model
-                    that
-                    could effectively surpass the ProNav baseline, which has long been considered the benchmark in
-                    pursuit-evasion tasks. Using PyTorch, I was able to successfully implement and train these models to
-                    significantly outperform the traditional guidance laws. This achievement demonstrated the potential
-                    of
-                    reinforcement learning in real-time decision-making for dynamic environments.</p>
-                <div class="image-container">
-                    <img src="figures/vicon.png" alt="Vicon System Visualization">
-                </div>
-                <p>To further enhance the performance of both the evader and pursuer policies, I employed competitive
-                    self-play. This method allowed agents to train against each other continuously, fostering a
-                    competitive
-                    environment that led to significant improvements in their strategies. The process of allowing the
-                    agents
-                    to adapt to the opponent's evolving tactics proved to be an effective means of optimizing their
-                    respective policies. Through repeated simulations and learning cycles, the agents evolved to be more
-                    robust and adaptive, making them highly capable of managing complex pursuit-evasion scenarios.</p>
-                <div class="image-container">
-                    <img src="figures/robotarium.jpg" alt="Robotarium Platform">
-                </div>
-                <p>In addition to the reinforcement learning development, I integrated an IMU (Inertial Measurement
-                    Unit)
-                    model into the Rate Table simulations using Simulink. This integration was pivotal in elevating the
-                    precision of rate table dynamics analysis, which is crucial for accurately characterizing the
-                    behavior
-                    of physical systems under various conditions. By incorporating the IMU model, the simulations
-                    provided a
-                    more realistic representation of the dynamic response, significantly improving the fidelity of the
-                    analysis. The enhanced accuracy ultimately contributed to better predictive control and improved
-                    system
-                    reliability during testing and evaluation.</p>
-                <div class="image-container">
-                    <img src="figures/czyfly.jpg" alt="Crazyflie Drone">
-                </div>
-            </section>
-        </main>
-
-        <footer class="bg-dark text-white py-4 mt-5">
-            <div class="container text-center">
-                <p>&copy; 2024 Timothy Dodge Projects Portfolio</p>
+            <p>To further enhance the performance of both the evader and pursuer policies, I employed competitive
+                self-play. This method allowed agents to train against each other continuously, fostering a competitive
+                environment that led to significant improvements in their strategies. The process of allowing the agents
+                to adapt to the opponent's evolving tactics proved to be an effective means of optimizing their
+                respective policies. Through repeated simulations and learning cycles, the agents evolved to be more
+                robust and adaptive, making them highly capable of managing complex pursuit-evasion scenarios.</p>
+            <div class="image-container">
+                <img src="figures/robotarium.jpg" alt="Robotarium Platform">
             </div>
-        </footer>
+            <p>In addition to the reinforcement learning development, I integrated an IMU (Inertial Measurement Unit)
+                model into the Rate Table simulations using Simulink. This integration was pivotal in elevating the
+                precision of rate table dynamics analysis, which is crucial for accurately characterizing the behavior
+                of physical systems under various conditions. By incorporating the IMU model, the simulations provided a
+                more realistic representation of the dynamic response, significantly improving the fidelity of the
+                analysis. The enhanced accuracy ultimately contributed to better predictive control and improved system
+                reliability during testing and evaluation.</p>
+            <div class="image-container">
+                <img src="figures/czfly.jpg" alt="Crazyflie Drone">
+            </div>
+        </section>
+    </main>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
-    </body>
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2024 Timothy Dodge Projects Portfolio</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+</body>
 
 </html>
