@@ -1,45 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connected Communities Simulated Annealing</title>
+    <title>Simulated Annealing Power Planning</title>
+    <link rel="icon" href="figures/robo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        .content {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-    </style>
 </head>
+
 <body class="bg-light">
     <main class="container content bg-white shadow-sm p-4 my-5 rounded">
-        <p>Simulated annealing is a probabilistic optimization algorithm inspired by the annealing process in metallurgy. It is used to find an approximate solution to complex optimization problems by exploring the solution space in a way that allows for occasional uphill moves, helping avoid local minima and increasing the chances of finding a global minimum.</p>
+        <p>Simulated annealing is a probabilistic optimization algorithm inspired by the annealing process in
+            metallurgy. It is used to find an approximate solution to complex optimization problems by exploring the
+            solution space in a way that allows for occasional uphill moves, helping avoid local minima and increasing
+            the chances of finding a global minimum.</p>
 
-        
+
 
         <section id="description">
             <h2>Description of Code</h2>
             <p>The overall node structure is shown in the figure below:</p>
             <img src="figures/node_struct.png" alt="Node Structure">
-            <p>The main ROS node that performs all calculations is the power node. Several of these nodes can run simultaneously. Each node passes its information to a filter node, which waits for all nodes to execute and then passes the information to the plotter node. The planner class is responsible for generating and accepting new solutions. It houses both a greedy and a Simulated Annealing planner.</p>
+            <p>The main ROS node that performs all calculations is the power node. Several of these nodes can run
+                simultaneously. Each node passes its information to a filter node, which waits for all nodes to execute
+                and then passes the information to the plotter node. The planner class is responsible for generating and
+                accepting new solutions. It houses both a greedy and a Simulated Annealing planner.</p>
             <img src="figures/planner.png" alt="Planner">
             <p>Within the planner class, solutions are held. The diagram for the solution class is shown below:</p>
             <img src="figures/power_sol.png" alt="Power Solution">
             <ul>
-                <li><strong>EnergyTimeSlots:</strong> This data member tracks the SOC of the battery over time. Each index of this data member stores the conservative power estimate defined and the accumulated energy based on the power and energy of the previous index within the <code>EnergyTimeSlots</code> data member.</li>
-                <li><strong>Event Map:</strong> This is a hash map that associates event IDs with a struct containing information such as event ID, power, start time, and end time.</li>
+                <li><strong>EnergyTimeSlots:</strong> This data member tracks the SOC of the battery over time. Each
+                    index of this data member stores the conservative power estimate defined and the accumulated energy
+                    based on the power and energy of the previous index within the <code>EnergyTimeSlots</code> data
+                    member.</li>
+                <li><strong>Event Map:</strong> This is a hash map that associates event IDs with a struct containing
+                    information such as event ID, power, start time, and end time.</li>
             </ul>
         </section>
 
         <section id="running-code">
             <h2>Running the Code</h2>
-            <p>To run the <code>BatteryAggregateBrute</code> class and see the overall timing as well as the average timing of adding and removing events, run the following command:</p>
+            <p>To run the <code>BatteryAggregateBrute</code> class and see the overall timing as well as the average
+                timing of adding and removing events, run the following command:</p>
             <pre><code>ros2 launch power_energy_propogation test_battery_aggregation_brute.launch.py</code></pre>
         </section>
 
@@ -47,10 +52,13 @@
         <section id="getting-started">
             <h2>Getting Started</h2>
             <h3>Downloading and Setting Up Workspace</h3>
-            <p>This code base was built on ROS 2 Humble Haskell. This ROS Distro must be installed to run the code. The instructions assume you are using a Debian-based distribution.</p>
-            <p>Each of the required repositories can be downloaded using the <code>wstool</code> tool. To use <code>wstool</code>, follow these steps:</p>
+            <p>This code base was built on ROS 2 Humble Haskell. This ROS Distro must be installed to run the code. The
+                instructions assume you are using a Debian-based distribution.</p>
+            <p>Each of the required repositories can be downloaded using the <code>wstool</code> tool. To use
+                <code>wstool</code>, follow these steps:</p>
             <ul>
-                <li>Create a workspace folder that will house the project: <code>mkdir -p ~/connected_communities_SA/src</code></li>
+                <li>Create a workspace folder that will house the project:
+                    <code>mkdir -p ~/connected_communities_SA/src</code></li>
                 <li>Navigate to the <code>src</code> folder</li>
                 <li>Create a new rosinstall file called <code>cc.rosinstall</code> with the following contents:</li>
             </ul>
@@ -69,18 +77,22 @@ wstool up
 
         <section id="python-venv">
             <h3>Creating Python Virtual Environment</h3>
-            <p>To create a virtual environment, you must be in the root of the workspace. The command below will create an alias for creating the needed virtual environment into your <code>bashrc</code>:</p>
+            <p>To create a virtual environment, you must be in the root of the workspace. The command below will create
+                an alias for creating the needed virtual environment into your <code>bashrc</code>:</p>
             <pre><code>alias make_cc_venv='python3 -m venv --system-site-packages venv && touch venv/COLCON_IGNORE'</code></pre>
-            <p>The following command is an alias that will allow you to build the code. IT MUST BE RUN FROM THE ROOT OF THE WORKSPACE.</p>
+            <p>The following command is an alias that will allow you to build the code. IT MUST BE RUN FROM THE ROOT OF
+                THE WORKSPACE.</p>
         </section>
 
         <section id="building-code">
             <h3>Building the Code</h3>
-            <p>For all other builds, the following alias can be used. It will source the environment and build the code:</p>
+            <p>For all other builds, the following alias can be used. It will source the environment and build the code:
+            </p>
             <pre><code>alias build='source venv/bin/activate && colcon build --symlink-install && . install/setup.bash'</code></pre>
         </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
