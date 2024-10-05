@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulated Annealing Power Planning</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <main class="container content bg-white shadow-sm p-4 my-5 rounded">
+        <h1>Power Forecasting With DNN</h1>
+
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>This is a project for power consumption forecasting with deep neural networks. This project utilized several different neural network architectures to predict power consumption.</p>
+        </section>
+
+        <section id="data-preprocessing">
+            <h2>Data and Data Preprocessing</h2>
+            <p>The data is from <a href="https://www.kaggle.com/datasets/jeanmidev/smart-meters-in-london">Kaggle</a>. The data is from smart meters in homes in the London area dataset. The data is from 2011 to 2014, in 30-minute intervals. It contains power data per half hour as well as several weather features.</p>
+            <p>To process the weather data, it was augmented to match the half-hour frequency of the power dataset through the use of quadratic interpolation. For descriptive columns, the descriptors from preceding rows were copied. The important columns and processes from the descriptor headings were processed into numerical values. After processing, the weather data contains information on visibility, temperature, dew point, pressure, wind speed, precipitation type, and humidity.</p>
+            <p>The power data was normalized by summing the power consumption across all households for each time interval and dividing by the total number of homes per time index. All values were then normalized using sklearn's MinMaxScaler.</p>
+        </section>
+
+        <section id="training-methodology">
+            <h2>Training Methodology</h2>
+            <p>A standard 70% Training, 10% Validation, and 20% Testing split was used.</p>
+        </section>
+
+        <section id="models">
+            <h2>Models</h2>
+
+            <h3>Baseline Model</h3>
+            <p>To compare our neural networks, the XGBoost algorithm was utilized. The number of estimators used was 1000.</p>
+
+            <h3>Deep Residual Network</h3>
+            <p>The first neural network used was a Deep Residual Neural Network. This network and all proceeding networks were implemented in PyTorch. Knowing that time series forecasting is an extremely complicated problem for a single output, it was clear that a linear network would need many layers to meaningfully process the input and predict an output window. As a result, residual connections were used between each layer to reduce the vanishing gradient problem that plagues neural networks deeper than seven layers.</p>
+            <img src="figures/DeepRes_Arch.png" alt="Deep Residual Network Architecture">
+            <p>The above figure shows the overall architecture of the Deep Residual Network. Residual connections are in the form of concatenating the output of a layer with its input, allowing the network to have ten layers with roughly 1000 nodes at each hidden layer. However, the ultra-deepness of the network also comes at the cost of having millions of learnable parameters.</p>
+
+            <h3>Convolutional Preprocessing - Fully Connected (CONV)</h3>
+            <p>A convolutional pre-processing (CONV) layer was employed before the dense layers of the neural network to take advantage of the time dependence of the input window. This layer effectively acts as a feature extraction layer for the power consumption data, allowing for more meaningful input to the dense layers. There is locality between each half-hour measurement in the input window, and a convolution through time helps the network extract these features more effectively before the dense layers.</p>
+            <img src="figures/CNN_Prep.png" alt="Convolutional Neural Network Architecture">
+
+            <h3>(CONV) - LSTM</h3>
+            <p>Building off the success of the CONV layer, the use of an LSTM was identified to take advantage of the interdependence of each point in the output window on one another. Looking at each half-hour prediction in the 24-hour output window, all predictions (except for the first) are dependent on all previous predictions. This makes LSTM ideal due to its cyclical method of inference. The LSTM architecture was implemented as shown in the below figure: a CONV layer extracts features from the power consumption data, followed by a linear layer to expand the features into an input sequence for the LSTM. Finally, an LSTM processes the input sequence and linear layers decode outputs from the LSTM into a power forecast.</p>
+            <img src="figures/LSTM_Arch.png" alt="LSTM Architecture">
+        </section>
+
+        <section id="results">
+            <h2>Results</h2>
+
+            <h3>Final Day Forecast Comparison</h3>
+            <p>The figure below shows the final day in the test set for each model. The true results are also shown for comparison. The CONV-LSTM model is the most accurate, followed by XGBoost, then the CONV model, and finally the Deep Residual Network. The XGBoost model tends to overestimate, which can be a conservative estimate for power consumption.</p>
+            <img src="figures/results_comparison.png" alt="Final Day Forecast Comparison">
+
+            <h3>Loss Comparison</h3>
+            <img src="figures/loss_comparison.png" alt="Loss Comparison">
+
+            <h3>Training Time Comparison</h3>
+            <img src="figures/timing_comparison.png" alt="Training Time Comparison">
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
